@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Weather app</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <img src="" alt="" srcset="" id="weather-icon">
+        <div id="location">Unable to Fetch Weather</div>
+        <div class="desc">No Information Available.</div>
+        <div class="weather">
+            <div class="c">Error</div>
+            <div class="circle"></div>
+            <div class="f">Error</div>
+        </div>
+        <div class="info">
+            <h4>Sunrise: <span class="sunrise">No Information Available</span></h4>
+            <h4>Sunset: <span class="sunset">No Information Available</span></h4>
+        </div>
+
+    </div>
+  
+
+
+  <script>
+    const api = '7846029971d778dc5e902b51bcdd2bcb'; // Replace with your API key
+
+    const iconImg = document.getElementById('weather-icon');
+    const loc = document.querySelector('#location');
+    const tempC = document.querySelector('.c');
+    const tempF = document.querySelector('.f');
+    const desc = document.querySelector('.desc');
+    const sunriseDOM = document.querySelector('.sunrise');
+    const sunsetDOM = document.querySelector('.sunset');
+
+    window.addEventListener('load', () => {
+      let long;
+      let lat;
+
+      // Accessing Geolocation of User
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          // Storing Longitude and Latitude in variables
+          long = position.coords.longitude;
+          lat = position.coords.latitude;
+          const base = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=${api}&units=metric`;
+
+          // Using fetch to get data
+          fetch(base)
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => { 
+              const { temp } = data.main;
+              const place = data.name;
+              const { description, icon } = data.weather[0];
+              const { sunrise, sunset } = data.sys;
+
+              const iconUrl =` https://openweathermap.org/img/wn/${icon}@2x.png;`
+              const fahrenheit = (temp * 9) / 5 + 32;
+
+              // Converting Epoch(Unix) time to GMT
+              const sunriseGMT = new Date(sunrise * 1000);
+              const sunsetGMT = new Date(sunset * 1000);
+
+              // Interacting with DOM to show data
+              iconImg.src = iconUrl;
+              loc.textContent = `Location: ${place};`
+              desc.textContent = `Description: ${description};`
+              tempC.textContent = `Temperature (°C): ${temp.toFixed(2)};`
+              tempF.textContent = `Temperature (°F): ${fahrenheit.toFixed(2)};`
+              sunriseDOM.textContent = `Sunrise: ${sunriseGMT.toLocaleTimeString()};`
+              sunsetDOM.textContent = `Sunset: ${sunsetGMT.toLocaleTimeString()};`
+            });
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
